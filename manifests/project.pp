@@ -8,25 +8,21 @@
 #    docker-compose-dctl.yaml      - overrides for User defined ("shell" template for use by dctl )
 #    docker-compose-[service].yaml - overrides for [service]    (epp template for use by puppet )
 #
-# this will also ensure that the defined service is running 
 
 #
 # @example
-#   dctl::service { 'namevar': }
+#   dctl::project { 'namevar': }
 
 
-define dctl::service (
-  Hash $compose_hash,
+define dctl::project (
+  
 ) {
 
-  # TODO this should be done as a project, with some kind of dependency
-  file { "/var/lib/docker-compose/projects/solr/":
+  # TODO, use var for first part
+  file { "/var/lib/docker-compose/projects/${name}/":
     ensure => directory,
   }
 
-  file { "/var/lib/docker-compose/projects/solr/docker-compose-${name}.yml":
-    ensure  => file,
-    content => to_yaml($compose_hash),
-  }
+  # the rest of the files
 
 }
