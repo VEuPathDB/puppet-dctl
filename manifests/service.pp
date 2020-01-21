@@ -26,7 +26,8 @@ define dctl::service (
 
   file { "/var/lib/docker-compose/projects/solr/docker-compose-${name}.yml":
     ensure  => file,
-    content => to_yaml($compose_hash),
+    # content => to_yaml($compose_hash), # this apparently is too simple to work :/
+    content => inline_template( '<%= @compose_hash.to_yaml %>' ),
   }
 
 }
