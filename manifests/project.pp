@@ -17,6 +17,7 @@
 define dctl::project (
   String $docker_compose_base,
   String $docker_compose_dctl,
+  Hash $service_hash,
   
 ) {
 
