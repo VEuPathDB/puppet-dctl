@@ -37,7 +37,7 @@ define dctl::service (
     content   => epp(Dctl::Project[$project][docker_compose_service_template], $template_hash),
   }
 
-  docker_compose { $project_$name:
+  docker_compose { "${project}_${name}":
     ensure        => present,
     compose_files => ["${project_dir}/docker-compose.yml", "${project_dir}/docker-compose-${name}.yml"],
   }
