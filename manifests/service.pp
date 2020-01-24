@@ -13,6 +13,7 @@
 define dctl::service (
   String $project,
   Hash $override_hash,
+  Array $environment_overrides = [],
 ) {
 
   # TODO this should be done as a project, with some kind of dependency
@@ -26,12 +27,14 @@ define dctl::service (
 
   # $merged_hash = merge(Dctl::Project[$project][service_hash], $override_hash)
 
+  $template_hash = merge($override_hash, $environment_overrides)
+
   # TODO use main var
   file { "/var/lib/docker-compose/projects/${project}/docker-compose-${name}.yml":
     ensure    => file,
     # content => to_yaml($compose_hash), # this apparently is too simple to work :/
     # content => inline_template( '<%= @merged_hash.to_yaml %>' ),
-    content   => epp(Dctl::Project[$project][docker_compose_service_template], $override_hash),
+    content   => epp(Dctl::Project[$project][docker_compose_service_template], $template_hash),
   }
 
 }
