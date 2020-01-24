@@ -24,14 +24,16 @@ define dctl::project (
   $main_project_dir = '/var/lib/docker-compose/projects'
   $project_dir = "${project_dir}/${name}/" 
 
+  file { $project_dir:
+    ensure => directory,
+  }
+
 
   file { "${project_dir}/docker-compose.yml":
-    ensure => file,
     source => $docker_compose_base,
   }
 
   file { "${project_dir}/docker-compose-dctl.yml":
-    ensure => file,
     source => $docker_compose_dctl,
   }
 
