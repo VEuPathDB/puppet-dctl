@@ -1,4 +1,4 @@
-# @summary create a docker-compose 'service' which includes templates for compose files & environment
+# @summary create a docker-compose project which includes templates for compose files & environment
 #
 # A description of what this defined type does
 
@@ -15,14 +15,27 @@
 
 
 define dctl::project (
+  String $docker_compose_base,
+  String $docker_compose_dctl,
   
 ) {
 
-  # TODO, use var for first part
-  file { "/var/lib/docker-compose/projects/${name}/":
-    ensure => directory,
+  # TODO, use var for first part, defined in params
+  $main_project_dir = '/var/lib/docker-compose/projects'
+  $project_dir = "${project_dir}/${name}/" 
+
+
+  file { "${project_dir}/docker-compose.yml":
+    ensure => file,
+    source => $docker_compose_base,
+  }
+
+  file { "${project_dir}/docker-compose-dctl.yml":
+    ensure => file,
+    source => $docker_compose_dctl,
   }
 
   # the rest of the files
+  #file { "/var/lib/docker-compose/projects/${name}/
 
 }
