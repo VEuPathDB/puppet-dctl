@@ -22,7 +22,7 @@ define dctl::project (
 
   # TODO, use var for first part, defined in params
   $main_project_dir = '/var/lib/docker-compose/projects'
-  $project_dir = "${project_dir}/${name}/" 
+  $project_dir = "${main_project_dir}/${name}/" 
 
   file { $project_dir:
     ensure => directory,
