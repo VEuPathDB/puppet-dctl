@@ -27,7 +27,7 @@ define dctl::service (
 
   # $merged_hash = merge(Dctl::Project[$project][service_hash], $override_hash)
 
-  $template_hash = merge($override_hash, $environment)
+  $template_hash = merge($override_hash, {environment => $environment})
 
   # TODO use main var
   file { "/var/lib/docker-compose/projects/${project}/docker-compose-${name}.yml":
