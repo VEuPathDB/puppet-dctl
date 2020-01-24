@@ -22,14 +22,16 @@ define dctl::service (
 
 
   # TODO merge override hash with project template
+  # merged hashes won't work, because lists won't merge.  Will have to do with a template
 
-  $merged_hash = merge(Dctl::Project[$project][service_hash], $override_hash)
+  # $merged_hash = merge(Dctl::Project[$project][service_hash], $override_hash)
 
   # TODO use main var
   file { "/var/lib/docker-compose/projects/${project}/docker-compose-${name}.yml":
-    ensure  => file,
+    ensure    => file,
     # content => to_yaml($compose_hash), # this apparently is too simple to work :/
-    content => inline_template( '<%= @merged_hash.to_yaml %>' ),
+    # content => inline_template( '<%= @merged_hash.to_yaml %>' ),
+    content   => epp(Dctl::Project[$project][docker_compose_service_template], $override_hash),
   }
 
 }
