@@ -23,7 +23,7 @@ define dctl::service (
 
   # TODO merge override hash with project template
 
-  $merged_hash = Dctl::Project[$project][service_hash]
+  $merged_hash = merge(Dctl::Project[$project][service_hash], $override_hash)
 
   # TODO use main var
   file { "/var/lib/docker-compose/projects/${project}/docker-compose-${name}.yml":
