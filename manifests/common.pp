@@ -3,14 +3,14 @@ class dctl::common {
   include '::docker::compose'
 
   # create directory structure
-  file { [ $dctl::docker_compose_dir, "${$dctl::docker_compose_dir}/${dctl::project_dir}" ] :
+  file { [ $::dctl::docker_compose_dir, "${$::dctl::docker_compose_dir}/${::dctl::project_dir}" ] :
     ensure => 'directory',
     owner  => 'root',
     group  => 'root',
     mode   => '0700',
   }
 
-  if ( $dctl::dctl_cli_enable ) {
+  if ( $::dctl::dctl_cli_enable ) {
     # dctl cli requires python36-docker module
     package { 'python36-docker':
       ensure   => installed
