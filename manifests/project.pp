@@ -18,26 +18,28 @@ define dctl::project (
   String $docker_compose_base,
   String $docker_compose_dctl,
   String $docker_compose_service_template,
-) {
+) inherits ::dctl::params {
 
-  # TODO, use var for first part, defined in params
-  $main_project_dir = '/var/lib/docker-compose/projects'
-  $project_dir = "${main_project_dir}/${name}/" 
+
+
+  # all templates will be deposited here
+  $project_dir = "${$::dctl::docker_compose_dir}/${::dctl::project_dir}"
 
   file { $project_dir:
     ensure => directory,
   }
 
 
+  # base docker-compose.yml
   file { "${project_dir}/docker-compose.yml":
     source => $docker_compose_base,
   }
 
+  # dctl docker-compose template
   file { "${project_dir}/docker-compose-dctl.yml":
     source => $docker_compose_dctl,
   }
 
-  # the rest of the files
-  #file { "/var/lib/docker-compose/projects/${name}/
+
 
 }
