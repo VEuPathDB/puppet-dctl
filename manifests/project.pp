@@ -23,7 +23,7 @@ define dctl::project (
 
 
   # all templates will be deposited here
-  $project_dir = "${$::dctl::docker_compose_dir}/${::dctl::project_dir}"
+  $project_dir = "${$::dctl::docker_compose_dir}/${::dctl::project_dir}/${name}"
 
   file { $project_dir:
     ensure => directory,
