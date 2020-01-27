@@ -28,8 +28,8 @@ define dctl::service (
 
   # render template for the service
   file { "${project_dir}/docker-compose-${name}.yml":
-    ensure    => file,
-    content   => epp(Dctl::Project[$project][docker_compose_service_template], $template_hash),
+    ensure  => file,
+    content => epp(Dctl::Project[$project][docker_compose_service_template], $template_hash),
   }
 
   # bring compose project up
