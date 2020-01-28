@@ -1,3 +1,14 @@
+# create framework directory structure, package requirements
+
+# @param dctl_cli_enable
+#   flag to toggle if the dependencies for the dctl cli application are needed.
+#
+# @param docker_compose_dir
+#   Main directory where project files are stored
+#
+# @param project_dir
+#   Name of the subdirectory where projects are stored
+#
 
 class dctl (
   $dctl_cli_enable    = $::dctl::params::dctl_cli_enable,
