@@ -1,87 +1,90 @@
-# dctl
-
-Welcome to your new module. A short overview of the generated parts can be found in the PDK documentation at https://puppet.com/pdk/latest/pdk_generating_modules.html .
-
-The README template below provides a starting point with details about what information to include in your README.
+# dctl - Docker-Compose Control
 
 #### Table of Contents
 
 1. [Description](#description)
 2. [Setup - The basics of getting started with dctl](#setup)
     * [What dctl affects](#what-dctl-affects)
-    * [Setup requirements](#setup-requirements)
     * [Beginning with dctl](#beginning-with-dctl)
 3. [Usage - Configuration options and additional functionality](#usage)
-4. [Limitations - OS compatibility, etc.](#limitations)
 5. [Development - Guide for contributing to the module](#development)
 
 ## Description
 
-Briefly tell users why they might want to use your module. Explain what your module does and what kind of problems users can solve with it.
-
-This should be a fairly short description helps the user decide if your module is what they want.
+This module manages deploying docker-compose projects via the docker puppet module.  It allows you to provide files and templates to docker compose, and manage those services in a flexible way.
 
 ## Setup
 
-### What dctl affects **OPTIONAL**
+### What dctl affects 
 
-If it's obvious what your module touches, you can skip this section. For example, folks can probably figure out that your mysql_instance module affects their MySQL instances.
-
-If there's more that they should know about, though, this is the place to mention:
-
-* Files, packages, services, or operations that the module will alter, impact, or execute.
-* Dependencies that your module automatically installs.
-* Warnings or other important notices.
-
-### Setup Requirements **OPTIONAL**
-
-If your module requires anything extra before setting up (pluginsync enabled, another module, etc.), mention it here.
-
-If your most recent release breaks compatibility or requires particular steps for upgrading, you might want to include an additional "Upgrading" section here.
+This modules creates a set of templates under /var/lib/docker-compose/projects (default, this location is configurable) and provides a way to define services using those templates
 
 ### Beginning with dctl
 
-The very basic steps needed for a user to get the module up and running. This can include setup steps, if necessary, or it can be an example of the most basic use of the module.
+No setup is needed, although knowledge of docker & docker-compose is assumed.  This module uses the terms *project* and *service* in distict ways:
+
+#### Projects
+
+a *project* is a set of docker-compose.yml files.  These consist of 3:
+* docker-compose.yml - the base configuration of the project
+* docker-compose-dctl.yml - an optional template used for a separate user based script (under development)
+* docker-compose-\[service\].yml - a template that provides overrides specific to a *service*
+
+#### Services
+
+a *service* is a single running instance of a project.  You may have a project named "webapp" that provides a compose file detailing your web application image, environment, etc.  You are likely to also want several running instances of this project, one for qa, one for prod, etc.  A *service* provides values that fill in the service template, which is run as an overrides file through docker-compose.
 
 ## Usage
 
-Include usage examples for common use cases in the **Usage** section. Show your users how to use your module to solve problems, and be sure to include code examples. Include three to five examples of the most important or common tasks a user can accomplish with your module. Show users how to accomplish more complex tasks that involve different types, classes, and functions working in tandem.
+Define a project:
 
-## Reference
-
-This section is deprecated. Instead, add reference information to your code as Puppet Strings comments, and then use Strings to generate a REFERENCE.md in your module. For details on how to add code comments and generate documentation with Strings, see the Puppet Strings [documentation](https://puppet.com/docs/puppet/latest/puppet_strings.html) and [style guide](https://puppet.com/docs/puppet/latest/puppet_strings_style.html)
-
-If you aren't ready to use Strings yet, manually create a REFERENCE.md in the root of your module directory and list out each of your module's classes, defined types, facts, functions, Puppet tasks, task plans, and resource types and providers, along with the parameters for each.
-
-For each element (class, defined type, function, and so on), list:
-
-  * The data type, if applicable.
-  * A description of what the element does.
-  * Valid values, if the data type doesn't make it obvious.
-  * Default value, if any.
-
-For example:
-
-```
-### `pet::cat`
-
-#### Parameters
-
-##### `meow`
-
-Enables vocalization in your cat. Valid options: 'string'.
-
-Default: 'medium-loud'.
+``` dctl::project{'testservice':
+    docker_compose_base => "puppet:///modules/profiles/testservice/docker-compose.yml",
+    docker_compose_dctl => "puppet:///modules/profiles/testservice/docker-compose.yml",
+    docker_compose_service_template => "profiles/testservice/docker-compose-service.epp",
+  }
 ```
 
-## Limitations
+Define 2 service instances of this project:
 
-In the Limitations section, list any incompatibilities, known issues, or other warnings.
+```
+  dctl::service {'testservice-prod':
+    project     => "testservice",
+    overrides   => {'domain' => 'production.example.com' },
+    environment => ['"JAVA_MEM=-Xms128m -Xmx128m"'],
+  }
+
+  dctl::service {'testservice-staging':
+    project       => "testservice",
+    overrides     => {'domain' => 'staging.example.com' },
+    update_images => ['example/image:tag']
+  }
+```
+
+Care should to be taken when defining the service templates, to make sure appropriate values are provided in the right way.  Environment variables should be handled this way:
+
+
+Example docker-compose-service.epp
+
+```
+version: '3.5'
+
+services:
+  solr:
+<% if $environment != [] { -%>
+    environment:
+<% $environment.each |$env| { -%>
+      - <%= $env %>
+<% } } -%>
+    labels:
+      - "traefik.http.routers.solr.rule=Host(`<%= $domain %>`)"
+      - "traefik.http.routers.solr.tls=true"
+      - "traefik.http.routers.solr.entrypoints=local"
+```
+
+
 
 ## Development
 
-In the Development section, tell other users the ground rules for contributing to your project and how they should submit their work.
+Pull requests welcomed
 
-## Release Notes/Contributors/Etc. **Optional**
-
-If you aren't using changelog, put your release notes here (though you should consider using changelog). You can also add any additional sections you feel are necessary or important to include here. Please use the `## ` header.
