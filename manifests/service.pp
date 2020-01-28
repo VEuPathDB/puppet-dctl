@@ -16,6 +16,7 @@ define dctl::service (
   String $project,
   Hash $overrides = {},
   Array $environment = [],
+  Array $update_images = [],
 ) {
 
   include '::docker'
@@ -32,6 +33,14 @@ define dctl::service (
   file { "${project_dir}/docker-compose-${name}.yml":
     ensure  => file,
     content => epp(Dctl::Project[$project][docker_compose_service_template], $template_hash),
+  }
+
+  # update any given images
+  $update_images.each |String $image| {
+    docker::image { $image:
+      image_tag => 'latest'
+    }
+
   }
 
   # bring compose project up
