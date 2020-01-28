@@ -38,7 +38,7 @@ define dctl::service (
   # update any given images
   $update_images.each |String $image| {
     docker::image { $image:
-      image_tag => 'latest'
+      before => Docker_compose["${project}_${name}"],
     }
 
   }
