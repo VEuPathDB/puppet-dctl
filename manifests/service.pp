@@ -1,14 +1,16 @@
 # @summary create a docker-compose 'service' which includes templates for compose files & environment
 #
 # this ensure that the service template is populated, and that the defined
-# service is running 
+# service is running.  Provide a list of images that should be updated before
+# docker-compose is brought up
 
 #
 # @example
 #  dctl::service {'testservice-prod':
-#    project     => "testservice",
-#    overrides   => {'domain' => 'bob.com' },
-#    environment => ['"SOLR_JAVA_MEM=-Xms128m -Xmx128m"'],
+#    project       => "testservice",
+#    overrides     => {'domain'                              => 'bob.com' },
+#    environment   => ['"SOLR_JAVA_MEM=-Xms128m -Xmx128m"'],
+#    update_images => ['example/image:tag'],
 #  }
 
 

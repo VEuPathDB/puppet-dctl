@@ -55,8 +55,9 @@ Define 2 service instances of this project:
   }
 
   dctl::service {'testservice-staging':
-    project   => "testservice",
-    overrides => {'domain' => 'staging.example.com' },
+    project       => "testservice",
+    overrides     => {'domain' => 'staging.example.com' },
+    update_images => ['example/image:tag']
   }
 ```
 
