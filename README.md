@@ -49,14 +49,14 @@ Define 2 service instances of this project:
 
 ```
   dctl::service {'testservice-prod':
-    project => "testservice",
-    override_hash => {'domain' => 'production.example.com' },
+    project     => "testservice",
+    overrides   => {'domain' => 'production.example.com' },
     environment => ['"JAVA_MEM=-Xms128m -Xmx128m"'],
   }
 
   dctl::service {'testservice-staging':
-    project => "testservice",
-    override_hash => {'domain' => 'staging.example.com' },
+    project   => "testservice",
+    overrides => {'domain' => 'staging.example.com' },
   }
 ```
 

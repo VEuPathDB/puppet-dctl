@@ -1,18 +1,20 @@
 # @summary create a docker-compose 'service' which includes templates for compose files & environment
 #
-# A description of what this defined type does
-
 # this ensure that the service template is populated, and that the defined
 # service is running 
 
 #
 # @example
-#   dctl::service { 'namevar': }
+#  dctl::service {'testservice-prod':
+#    project     => "testservice",
+#    overrides   => {'domain' => 'bob.com' },
+#    environment => ['"SOLR_JAVA_MEM=-Xms128m -Xmx128m"'],
+#  }
 
 
 define dctl::service (
   String $project,
-  Hash $override_hash = {},
+  Hash $overrides = {},
   Array $environment = [],
 ) {
 
@@ -23,8 +25,8 @@ define dctl::service (
   $project_dir = "${$::dctl::docker_compose_dir}/${::dctl::project_dir}/${project}"
 
 
-  # add environment array to override_hash for rendering
-  $template_hash = merge($override_hash, {environment => $environment})
+  # add environment array to overrides for rendering
+  $template_hash = merge($overrides, {environment => $environment})
 
   # render template for the service
   file { "${project_dir}/docker-compose-${name}.yml":
