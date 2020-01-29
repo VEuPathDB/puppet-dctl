@@ -17,7 +17,7 @@ This module manages deploying docker-compose projects via the docker puppet modu
 
 ### What dctl affects 
 
-This modules creates a set of templates under /var/lib/docker-compose/projects (default, this location is configurable) and provides a way to define services using those templates
+This module creates a set of templates under /var/lib/docker-compose/projects (default, this location is configurable) and provides a way to define services using those templates
 
 ### Beginning with dctl
 
@@ -38,7 +38,8 @@ a *service* is a single running instance of a project.  You may have a project n
 
 Define a project:
 
-``` dctl::project{'testservice':
+``` 
+  dctl::project{'testservice':
     docker_compose_base => "puppet:///modules/profiles/testservice/docker-compose.yml",
     docker_compose_dctl => "puppet:///modules/profiles/testservice/docker-compose.yml",
     docker_compose_service_template => "profiles/testservice/docker-compose-service.epp",
