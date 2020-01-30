@@ -50,9 +50,11 @@ Define 2 service instances of this project:
 
 ```
   dctl::service {'testservice-prod':
-    project     => "testservice",
-    overrides   => {'domain' => 'production.example.com' },
-    environment => ['"JAVA_MEM=-Xms128m -Xmx128m"'],
+    project   => "testservice",
+    overrides => {
+      'domain'      => 'production.example.com', 
+      'environment' => ['"JAVA_MEM=-Xms128m -Xmx128m"'],
+    }
   }
 
   dctl::service {'testservice-staging':
