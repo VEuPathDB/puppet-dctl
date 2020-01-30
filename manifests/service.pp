@@ -17,7 +17,6 @@
 define dctl::service (
   String $project,
   Hash $overrides = {},
-  Array $environment = [],
   Array $update_images = [],
 ) {
 
@@ -27,14 +26,10 @@ define dctl::service (
   # TODO fix how project_dir is overloaded
   $project_dir = "${$::dctl::docker_compose_dir}/${::dctl::project_dir}/${project}"
 
-
-  # add environment array to overrides for rendering
-  $template_hash = merge($overrides, {environment => $environment})
-
   # render template for the service
   file { "${project_dir}/docker-compose-${name}.yml":
     ensure  => file,
-    content => epp(Dctl::Project[$project][docker_compose_service_template], $template_hash),
+    content => epp(Dctl::Project[$project][docker_compose_service_template], $overrides),
   }
 
   # update any given images
