@@ -45,6 +45,7 @@ define dctl::service (
   docker_compose { "${project}_${name}":
     ensure        => present,
     compose_files => ["${project_dir}/docker-compose.yml", "${project_dir}/docker-compose-${name}.yml"],
+    subscribe     => [File["${project_dir}/docker-compose.yml"], File["${project_dir}/docker-compose-${name}.yml"]],
   }
 
 
