@@ -8,9 +8,9 @@
 # @example
 #  dctl::service {'testservice-prod':
 #    project       => "testservice",
-#    overrides     => {'domain'                              => 'bob.com' },
+#    overrides     => {'domain' => 'bob.com' },
 #    environment   => ['"SOLR_JAVA_MEM=-Xms128m -Xmx128m"'],
-#    update_images => ['example/image:tag'],
+#    update_images => {image => 'example/image', image_tag => 'tag'}
 #  }
 
 
