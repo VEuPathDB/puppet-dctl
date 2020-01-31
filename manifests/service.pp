@@ -8,9 +8,9 @@
 # @example
 #  dctl::service {'testservice-prod':
 #    project       => "testservice",
-#    overrides     => {'domain'                              => 'bob.com' },
+#    overrides     => {'domain' => 'bob.com' },
 #    environment   => ['"SOLR_JAVA_MEM=-Xms128m -Xmx128m"'],
-#    update_images => ['example/image:tag'],
+#    update_images => {image => 'example/image', image_tag => 'tag'}
 #  }
 
 
@@ -33,8 +33,9 @@ define dctl::service (
   }
 
   # update any given images
-  $update_images.each |String $image| {
-    docker::image { $image:
+  $update_images.each |Hash $image| {
+    docker::image { $image['image']:
+      image_tag => $image['image_tag'],
       before => Docker_compose["${project}_${name}"],
     }
 
