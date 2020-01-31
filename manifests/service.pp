@@ -33,8 +33,9 @@ define dctl::service (
   }
 
   # update any given images
-  $update_images.each |String $image| {
-    docker::image { $image:
+  $update_images.each |Hash $image| {
+    docker::image { $image['image']:
+      image_tag => $image['image_tag'],
       before => Docker_compose["${project}_${name}"],
     }
 
