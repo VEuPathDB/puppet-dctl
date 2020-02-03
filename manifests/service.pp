@@ -15,7 +15,6 @@
 
 
 define dctl::service (
-  String $project,
   Hash $overrides = {},
   Array $update_images = [],
 ) {
@@ -23,11 +22,16 @@ define dctl::service (
   include '::docker'
   include '::docker::compose'
 
+  $name_array = split($name, '_') # pull apart name, using PROJECT_SERVICE convention
+
+  $project = $name_array[0]
+  $service = $name_array[1]
+
   # TODO fix how project_dir is overloaded
   $project_dir = "${$::dctl::docker_compose_dir}/${::dctl::project_dir}/${project}"
 
   # render template for the service
-  file { "${project_dir}/docker-compose-${name}.yml":
+  file { "${project_dir}/docker-compose-${service}.yml":
     ensure  => file,
     content => epp(Dctl::Project[$project][docker_compose_service_template], $overrides),
   }
@@ -36,16 +40,16 @@ define dctl::service (
   $update_images.each |Hash $image| {
     docker::image { $image['image']:
       image_tag => $image['image_tag'],
-      before => Docker_compose["${project}_${name}"],
+      before => Docker_compose["${name}"],
     }
 
   }
 
   # bring compose project up
-  docker_compose { "${project}_${name}":
+  docker_compose { "${name}":
     ensure        => present,
-    compose_files => ["${project_dir}/docker-compose.yml", "${project_dir}/docker-compose-${name}.yml"],
-    subscribe     => [File["${project_dir}/docker-compose.yml"], File["${project_dir}/docker-compose-${name}.yml"]],
+    compose_files => ["${project_dir}/docker-compose.yml", "${project_dir}/docker-compose-${service}.yml"],
+    subscribe     => [File["${project_dir}/docker-compose.yml"], File["${project_dir}/docker-compose-${service}.yml"]],
   }
 
 
