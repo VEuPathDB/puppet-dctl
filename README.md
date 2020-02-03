@@ -46,19 +46,17 @@ Define a project:
   }
 ```
 
-Define 2 service instances of this project:
+Define 2 service instances of this project.  NOTE: The naming of the resource *must* follow the PROJECT_SERVICE pattern.  The reference to the project is taken directly from the name:
 
 ```
-  dctl::service {'testservice-prod':
-    project   => "testservice",
+  dctl::service {'testservice_prod':
     overrides => {
       'domain'      => 'production.example.com', 
       'environment' => ['"JAVA_MEM=-Xms128m -Xmx128m"'],
     }
   }
 
-  dctl::service {'testservice-staging':
-    project       => "testservice",
+  dctl::service {'testservice_staging':
     overrides     => {'domain' => 'staging.example.com' },
     update_images => {image => 'example/image', image_tag => 'tag'}
   }

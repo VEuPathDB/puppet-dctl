@@ -4,10 +4,13 @@
 # service is running.  Provide a list of images that should be updated before
 # docker-compose is brought up
 
+# This uses the naming convention PROJECT_SERVICE when this is used.  The
+# project reference is taken directly from the name.
 #
+# The below example uses the testservice project
+
 # @example
-#  dctl::service {'testservice-prod':
-#    project       => "testservice",
+#  dctl::service {'testservice_prod':
 #    overrides     => {'domain' => 'bob.com' },
 #    environment   => ['"SOLR_JAVA_MEM=-Xms128m -Xmx128m"'],
 #    update_images => {image => 'example/image', image_tag => 'tag'}
@@ -23,7 +26,6 @@ define dctl::service (
   include '::docker::compose'
 
   $name_array = split($name, '_') # pull apart name, using PROJECT_SERVICE convention
-
   $project = $name_array[0]
   $service = $name_array[1]
 
@@ -44,6 +46,9 @@ define dctl::service (
     }
 
   }
+
+  # TODO this unfortunately restarts the whole project on refresh - would be
+  # nice if it did a nice 'docker-compose up'
 
   # bring compose project up
   docker_compose { "${name}":
