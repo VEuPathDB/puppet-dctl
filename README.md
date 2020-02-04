@@ -34,6 +34,37 @@ a *project* is a set of docker-compose.yml files.  These consist of 3:
 
 a *service* is a single running instance of a project.  You may have a project named "webapp" that provides a compose file detailing your web application image, environment, etc.  You are likely to also want several running instances of this project, one for qa, one for prod, etc.  A *service* provides values that fill in the service template, which is run as an overrides file through docker-compose.
 
+#### Images
+
+Images are listed seperately, as they are updated by this module.  Because of this, and because there isn't an easy way to override the tag of the image, the service definition requires all images be defined in the service.
+
+If images are used in your templates, the images argument  *must* specify:
+
+ * template_name - the name used by the template for the image: line in the docker-compose-SERVICE.yml file
+ * image_name    - the name of the image (organization/repo)
+ * image_tag     - the tag for the image (:tagname)
+ * update        - whether to update the image to the latest version
+
+The image_name:image_tag is set to the value of 'template_name' for use by the template
+
+ The below example uses the testservice project
+
+```
+  dctl::service {'testservice_prod':
+    images => {
+      'template_name' => 'demo_image',
+      'image_name'    => 'demo_name',
+      'image_tag'     => 'demo_tag',
+      'update'        => false }
+    overrides     => {'domain' => 'bob.com' },
+    environment   => ['"SOLR_JAVA_MEM=-Xms128m -Xmx128m"'],
+    update_images => {image => 'example/image', image_tag => 'tag'}
+  }
+```
+
+For the above example, the template can make use of the value $demo_image which would contain 'demo_name:demo_tag'  This image would not be kept up to date.
+
+
 ## Usage
 
 Define a project:
@@ -50,6 +81,12 @@ Define 2 service instances of this project.  NOTE: The naming of the resource *m
 
 ```
   dctl::service {'testservice_prod':
+    images => [
+      'template_name' => 'demo_image',
+      'image_name'    => 'demo_name',
+      'image_tag'     => 'demo_tag',
+      'update'        => false 
+    ],
     overrides => {
       'domain'      => 'production.example.com', 
       'environment' => ['"JAVA_MEM=-Xms128m -Xmx128m"'],
@@ -58,11 +95,19 @@ Define 2 service instances of this project.  NOTE: The naming of the resource *m
 
   dctl::service {'testservice_staging':
     overrides     => {'domain' => 'staging.example.com' },
-    update_images => {image => 'example/image', image_tag => 'tag'}
   }
 ```
 
-Care should to be taken when defining the service templates, to make sure appropriate values are provided in the right way.  Environment variables should be handled this way:
+Care should to be taken when defining the service templates, to make sure appropriate values are provided in the right way.  For the above 'testservcie_prod' service, the template could use 
+
+```
+services:
+  demo:
+    image: <%= demo_image %>
+...
+```
+
+Environment variables should be handled this way:
 
 
 Example docker-compose-service.epp
@@ -72,6 +117,7 @@ version: '3.5'
 
 services:
   solr:
+    image: <%= $solr_image %>
 <% if $environment != [] { -%>
     environment:
 <% $environment.each |$env| { -%>

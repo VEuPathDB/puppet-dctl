@@ -7,10 +7,20 @@
 # This uses the naming convention PROJECT_SERVICE when this is used.  The
 # project reference is taken directly from the name.
 #
+# image management is done through the passed in images argument, which *must* specify:
+# * template name - the name used by the template for the image: line in the docker-compose-SERVICE.yml file
+# * image_name    - the name of the image
+# * update        - whether to update the image to the latest version
+#
 # The below example uses the testservice project
 
 # @example
 #  dctl::service {'testservice_prod':
+#    images => {
+#      'template_name' => 'demo_image',
+#      'image_name' => 'demo_name',
+#      'image_tag'  => 'demo_tag',
+#      'update'     => false }
 #    overrides     => {'domain' => 'bob.com' },
 #    environment   => ['"SOLR_JAVA_MEM=-Xms128m -Xmx128m"'],
 #    update_images => {image => 'example/image', image_tag => 'tag'}
@@ -19,7 +29,7 @@
 
 define dctl::service (
   Hash $overrides = {},
-  Array $update_images = [],
+  Array $images = [],
 ) {
 
   include '::docker'
@@ -31,19 +41,28 @@ define dctl::service (
 
   $full_project_path = "${$::dctl::docker_compose_dir}/${::dctl::project_dir}/${project}"
 
+  # add images to template hash
+  # this looks quite a mess, but just takes the $images array, and sets the 
+  # 'template_name' to 'image_name/image_tag' based on the list of $images given for the service
+  $template_images = $images.reduce({}) |$memo, $value| { $memo.merge( {$value['template_name'] => "${value['image_name']}:${value['image_tag']}" } ) }
+
+  # merge in image hash
+  $template_hash = merge($overrides, $template_images)
+
   # render template for the service
   file { "${full_project_path}/docker-compose-${service}.yml":
     ensure  => file,
-    content => epp(Dctl::Project[$project][docker_compose_service_template], $overrides),
+    content => epp(Dctl::Project[$project][docker_compose_service_template], $template_hash),
   }
 
   # update any given images
-  $update_images.each |Hash $image| {
-    docker::image { $image['image']:
-      image_tag => $image['image_tag'],
-      before    => Docker_compose[$name],
+  $images.each |Hash $image| {
+    if ($image['update']) {
+      docker::image { $image['image_name']:
+        image_tag => $image['image_tag'],
+        before    => Docker_compose[$name],
+      }
     }
-
   }
 
   # TODO this unfortunately restarts the whole project on refresh - would be
