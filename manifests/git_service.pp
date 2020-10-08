@@ -111,7 +111,7 @@ END
     compose_files => [
       "${full_project_path}/${deploy_env}/docker-compose.yml",
     ],
-    options => "--env-file ${full_project_path}/${deploy_env}/.env",
+    options => ["--env-file", "${full_project_path}/${deploy_env}/.env"],
   }
 
 
