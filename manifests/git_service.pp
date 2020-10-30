@@ -43,7 +43,7 @@ define dctl::git_service (
   Hash $project_vars = {},
   Hash $service_vars = {},
 ) {
-  
+
   include '::docker'
   include '::docker::compose'
 
@@ -52,7 +52,7 @@ define dctl::git_service (
   # create_resources, it is often easier to conform to the PROJECT_ENV standard
   # in hiera than to try and construct it after the fact in this define
 
-  $name_array = split($name, '_') 
+  $name_array = split($name, '_')
   $project = $name_array[0]
   $deploy_env = $name_array[1]
 

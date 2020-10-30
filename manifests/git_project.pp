@@ -27,7 +27,17 @@ define dctl::git_project (
   $project_dir = "${$::dctl::docker_compose_dir}/${::dctl::project_dir}/${name}"
 
   # create project dir and compose_files storage dir
-  file { [$project_dir, "${project_dir}/compose_files"]:
+
+  # until old-style projects are retired, we need to conditionally check for
+  # existence of this resource, since it is defined both places
+
+  if ! defined(File[$project_dir]) {
+    file { $project_dir:
+      ensure => directory,
+    }
+  }
+
+  file { "${project_dir}/compose_files":
     ensure => directory,
   }
 

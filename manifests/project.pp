@@ -26,8 +26,13 @@ define dctl::project (
   # all templates will be deposited here
   $project_dir = "${$::dctl::docker_compose_dir}/${::dctl::project_dir}/${name}"
 
-  file { $project_dir:
-    ensure => directory,
+  # until old-style projects are retired, we need to conditionally check for
+  # existence of this resource, since it is defined both places
+
+  if ! defined(File[$project_dir]) {
+    file { $project_dir:
+      ensure => directory,
+    }
   }
 
   # base docker-compose.yml
