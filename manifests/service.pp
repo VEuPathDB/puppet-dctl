@@ -112,6 +112,7 @@ END
       "${full_project_path}/${deploy_env}/docker-compose.yml",
     ],
     options => ["--env-file", "${full_project_path}/${deploy_env}/.env"],
+    require => Service['docker'],
   }
 
 
