@@ -9,11 +9,15 @@
 # @param project_dir
 #   Name of the subdirectory where projects are stored
 #
+# @param projects
+#   list of projects to create
+#
 
 class dctl (
   $dctl_cli_enable    = $::dctl::params::dctl_cli_enable,
   $docker_compose_dir = $::dctl::params::docker_compose_dir,
   $project_dir        = $::dctl::params::project_dir,
+  $projects           = $::dctl::params::projects,
 ) inherits ::dctl::params {
 
   include '::docker'
@@ -43,6 +47,11 @@ END
       priority => 16,
     }
 
+  }
+
+  # create projects (typically pulled from hiera)
+  if ($projects) {
+    create_resources(dctl::project, $projects)
   }
 
 
